@@ -71,7 +71,15 @@
 					</div>
 					<div class="row">
 						<div class="col-lg-12">
-							<h3>The one place to store all your golfing rounds</h3>
+							<h3>What Is TeeTime</h3>
+							<h4>TeeTime is the one place to store all your golfing rounds. It has an awesome interactive tables that allow you to search your massive round collection in a matter of milliseconds. You can also upload a profile picture if you so desire. Security is important so only you can view your TeeTime rounds. TeeTime is built with the most advanced web dev languages, PHP, HTML, JavaScript, CSS and uses the most common web frameworks jquery and bootstrap.</h3>
+							<h3>Features</h3>
+							<ul>
+								<li>Loing/regestration</li>
+								<li>Score Storing</li>
+								<li>Searchable Tables</li>
+								<li>Andorid App Avaliable</li>
+							</ul>
 						</div>
 					</div>
 				</div>
