@@ -1,0 +1,558 @@
+﻿<!DOCTYPE html>
+<html lang="en" style="background-color:white;">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Trent Killinger">
+    <title>TeeTime</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="css/sb-admin.css" rel="stylesheet">
+    <!-- Morris Charts CSS -->
+    <link href="css/plugins/morris.css" rel="stylesheet">
+    <!-- Custom Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- /#wrapper -->
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/scripts.js"></script>
+    <!-- Datatables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/jq-2.2.4/dt-1.10.15/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/jq-2.2.4/dt-1.10.15/datatables.min.js"></script>
+    <!-- Timepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <!-- JqueryUI-->
+    <script src="js/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css" />
+    <script>
+
+        $(document).ready(function () {
+            
+        });
+
+        function testEnter(event) {
+            if (event.keyCode == 13) {
+                login(event);
+            }
+        }
+
+        function hideSignup(event) {
+            event.stopPropagation();
+            $("#signupArea").slideUp();
+            $('#btnShowSignupArea').show();
+        }
+
+        function showSignupArea(event) {
+            $(this).hide();
+            $('#firstname').val('');
+            $('#lastname').val('');
+            $('#email').val('');
+            $('#password').val('');
+            $('#password2').val('');
+            $('#phone').val('');
+            $('#address').val('');
+            $('#city').val('');
+            $('#state').val('AL');
+            $('#zip').val('');
+            setNuetral('firstname');
+            setNuetral('lastname');
+            setNuetral('email');
+            setNuetral('password');
+            setNuetral('password2');
+            setNuetral('phone');
+            setNuetral('address');
+            setNuetral('city');
+            setNuetral('zip');
+            $('#signupMessage').html('');
+            $('#btnShowSignupArea').hide();
+            $("#signupArea").slideDown();
+            event.stopPropagation();
+
+        }
+
+        function login(event) {
+            event.stopPropagation();
+            $.post(
+                "php/controler.php",
+                "&action=" + 'login' +
+                "&username=" + $('#loginusername').val() +
+                "&password=" + $('#loginpassword').val()
+            ).done(function (msg) {
+                console.log(msg.result);
+                var obj = JSON.parse(msg);
+                if (obj.result) {
+                    $('#userDropdown').html(
+                        '<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i>&nbsp; Welcome ' + obj.name + '<b class="caret"></b></a>' +
+                        '<ul class="dropdown-menu">' +
+                        '<li>' +
+                        '<a href="javascript:loadProfile();"><i class="fa fa-fw fa-user"></i> Profile</a>' +
+                        '</li>' +
+                        '<li class="divider"></li>' +
+                        '<li>' +
+                        '<a href="javascript:logout();"><i class="fa fa-fw fa-power-off""></i> Log Out</a>' +
+                        '</li>' +
+                        '</ul>');
+                    //$('.dropdown.open .dropdown-toggle').dropdown('toggle');
+                    loadSideBar();
+                }
+                else {
+                    $('#loginMessage').html('Username/Password is incorrect.');
+                    $('#loginMessage').css('color', 'red');
+                }
+            });
+        }
+
+        function personsRequest(action, id) {
+            $('#loading').show();
+            $.post(
+                "php/controler.php",
+                "table=" + "persons" +
+                "&action=" + action +
+                "&id=" + id +
+                "&fname=" + $("#userfname").val() +
+                "&lname=" + $("#userlname").val() +
+                "&password=" + $("#userpassword").val() +
+                "&address=" + $("#useraddress").val() +
+                "&city=" + $("#usercity").val() +
+                "&state=" + $("#userstate").val() +
+                "&zip=" + $("#userzip").val() +
+                "&email=" + $("#useremail").val() +
+                "&phone=" + $("#userphone").val()
+            ).done(function (msg) {
+                $('#page-contents').html(msg);
+                $('#page-contents').find('.table').DataTable();
+                $('.side-nav').find('.active').removeClass('active');
+                $(this).addClass('active');
+                $('#loading').hide();
+            });
+        }
+
+        function roundsRequest(action, id) {
+            $('#loading').show();
+            $.post(
+                "php/controler.php",
+                "table=" + "rounds" +
+                "&action=" + action +
+                "&id=" + id +
+                "&course_id=" + $("#course_id").val() +
+                "&person_id=" + $("#person_id").val() +
+                "&strokes01=" + $("#strokes01").val() +
+                "&strokes02=" + $("#strokes02").val() +
+                "&strokes03=" + $("#strokes03").val() +
+                "&strokes04=" + $("#strokes04").val() +
+                "&strokes05=" + $("#strokes05").val() +
+                "&strokes06=" + $("#strokes06").val() +
+                "&strokes07=" + $("#strokes07").val() +
+                "&strokes08=" + $("#strokes08").val() +
+                "&strokes09=" + $("#strokes09").val() +
+                "&strokes10=" + $("#strokes10").val() +
+                "&strokes11=" + $("#strokes11").val() +
+                "&strokes12=" + $("#strokes12").val() +
+                "&strokes13=" + $("#strokes13").val() +
+                "&strokes14=" + $("#strokes14").val() +
+                "&strokes15=" + $("#strokes15").val() +
+                "&strokes16=" + $("#strokes16").val() +
+                "&strokes17=" + $("#strokes17").val() +
+                "&strokes18=" + $("#strokes18").val() +
+                "&teedate=" + $("#teedate").val() +
+                "&teetime=" + $("#teetime").val()
+            ).done(function (msg) {
+                $('#page-contents').html(msg);
+                $('#page-contents').find('.table').DataTable();
+                $('#page-contents').find('.date').datepicker({ format: 'MM/dd/yyyy' });
+                $('#page-contents').find('.time').timepicker({ dropdown: false, timeFormat: 'HH:mm:ss' });
+                $('.side-nav').find('.active').removeClass('active');
+                $(this).addClass('active');
+                $('#loading').hide();
+            });
+        }
+
+        function coursesRequest(action, id) {
+            $('#loading').show();
+            $.post(
+                "php/controler.php",
+                "table=" + "courses" +
+                "&action=" + action +
+                "&id=" + id +
+                "&address=" + $("#courseaddress").val() +
+                "&city=" + $("#coursecity").val() +
+                "&description=" + $("#coursedescription").val() +
+                "&email=" + $("#courseemail").val() +
+                "&name=" + $("#coursename").val() +
+                "&par01=" + $("#par01").val() +
+                "&par02=" + $("#par02").val() +
+                "&par03=" + $("#par03").val() +
+                "&par04=" + $("#par04").val() +
+                "&par05=" + $("#par05").val() +
+                "&par06=" + $("#par06").val() +
+                "&par07=" + $("#par07").val() +
+                "&par08=" + $("#par08").val() +
+                "&par09=" + $("#par09").val() +
+                "&par10=" + $("#par10").val() +
+                "&par11=" + $("#par11").val() +
+                "&par12=" + $("#par12").val() +
+                "&par13=" + $("#par13").val() +
+                "&par14=" + $("#par14").val() +
+                "&par15=" + $("#par15").val() +
+                "&par16=" + $("#par16").val() +
+                "&par17=" + $("#par17").val() +
+                "&par18=" + $("#par18").val() +
+                "&phone=" + $("#coursephone").val() +
+                "&state=" + $("#coursestate").val() +
+                "&zip=" + $("#coursezip").val()
+            ).done(function (msg) {
+                $('#page-contents').html(msg);
+                $('#page-contents').find('.table').DataTable();
+                $('.side-nav').find('.active').removeClass('active');
+                $(this).addClass('active');
+                $('#loading').hide();
+            });
+        }
+
+        function logout() {
+            $.post(
+                "php/controler.php",
+                "&action=" + 'logout'
+            ).done(function (msg) {
+                var obj = JSON.parse(msg);
+                if (obj.result) {
+                    $('#userDropdown').html('<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i>&nbsp;Login/Signup<b class="caret"></b></a><ul class="dropdown-menu"><li><div class="container" style="width:400px;padding:10px;"><div class="row"><div class="col-xs-12"><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:100px;">Username</span><input type="text" id="loginusername" class="form-control" placeholder="Username" aria-describedby="basic-addon1"></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:100px;">Password</span><input type="password" id="loginpassword" class="form-control" placeholder="Password" aria-describedby="basic-addon1"></div><div id="loginMessage" style="width:100%;padding-bottom:5px;"></div><button type="button" onclick="login(event);" class="btn btn-success pull-left">Login</button><button type="button" id="btnShowSignupArea" onclick="showSignupArea(event)" class="btn btn-default pull-right">Signup</button></div></div><div class="row" id="signupArea" style="display:none"><hr/><div class="col-xs-12"><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">First Name</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="firstname" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Last Name</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="lastname" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Email</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="email" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Password</span><div class="input-group has-feedback" style="width:100%;"><input type="password" id="password" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Re-enter Password</span><div class="input-group has-feedback" style="width:100%;"><input type="password" id="password2" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Phone</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="phone" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Address</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="address" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">City</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="city" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">State</span><select id="state" onclick="event.stopPropagation();" class="form-control" placeholder="" aria-describedby="basic-addon1"><option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option><option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option><option value="DC">District Of Columbia</option><option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option><option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option><option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option><option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option><option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option><option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option><option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option><option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option><option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option><option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option><option value="WI">Wisconsin</option><option value="WY">Wyoming</option></select></div><div class="input-group" style="margin-bottom:5px;width:100%;"><span class="input-group-addon" id="basic-addon1" style="width:150px;">Zip</span><div class="input-group has-feedback" style="width:100%;"><input type="text" id="zip" class="form-control" placeholder="" aria-describedby="basic-addon1"><span style="display:none;" class="glyphicon glyphicon-remove form-control-feedback"></span></div></div><div style="color:red;" id="signupMessage"></div><button type="button" onclick="signup(event);" class="btn btn-primary pull-right">Signup</button><button type="button" onclick="hideSignup(event);" class="btn btn-default pull-left">Cancel</button></div></div></div></li></ul>')
+                }
+                loadSideBar();
+            });
+        }
+
+        function loadDashboard() {
+            $.post(
+                "php/controler.php",
+                "&action=" + 'loaddashboard'
+            ).done(function (msg) {
+                $('#page-contents').html(msg);
+                $('.side-nav').find('.active').removeClass('active');
+                $(this).addClass('active');
+                });
+        }
+
+        function loadProfile() {
+            $.post(
+                "php/controler.php",
+                "&action=" + 'loadprofile'
+            ).done(function (msg) {
+                $('#page-contents').html(msg);
+                $('.side-nav').find('.active').removeClass('active');
+                $(this).parent().addClass('active');
+            });
+        }
+
+        function signup(event) {
+            event.stopPropagation();
+            if (validateSignup()) {
+                $("#signupArea").slideUp();
+                $('#btnShowSignupArea').show();
+                $.post(
+                    "php/controler.php",
+                    "&action=" + 'signup' +
+                    "&fname=" + $("#firstname").val() +
+                    "&lname=" + $("#lastname").val() +
+                    "&password=" + $("#password").val() +
+                    "&address=" + $("#address").val() +
+                    "&city=" + $("#city").val() +
+                    "&state=" + $("#state").val() +
+                    "&zip=" + $("#zip").val() +
+                    "&email=" + $("#email").val() +
+                    "&phone=" + $("#phone").val()
+                ).done(function (msg) {
+                    var obj = JSON.parse(msg);
+                    if (obj.result) {
+                        $('#loginMessage').html('Account Created, please sign in.');
+                        $('#loginMessage').css('color', 'green');
+                    } else {
+                        $('#loginMessage').html(obj.message);
+                        $('#loginMessage').css('color', 'red');
+                    }
+                });
+            }
+
+        }
+
+        function loadSideBar() {
+            $.post(
+                "php/controler.php",
+                "&action=" + 'loadsidebar'
+            ).done(function (msg) {
+                $('.side-nav').html(msg);
+            });
+        }
+
+        function updateProfile(event) {
+            if (validateProfileUpdate()) {
+                var file_data = $('#file').prop('files')[0];
+                var form_data = new FormData();
+                form_data.append('file', file_data);
+                form_data.append('action', 'updateprofile');
+                form_data.append('fname', $("#profilefirstname").val());
+                form_data.append('lname', $("#profilelastname").val());
+                form_data.append('password', $("#profilepassword").val());
+                form_data.append('address', $("#profileaddress").val());
+                form_data.append('city', $("#profilecity").val());
+                form_data.append('state', $("#profilestate").val());
+                form_data.append('zip', $("#profilezip").val());
+                form_data.append('email', $("#profileemail").val());
+                form_data.append('phone', $("#profilephone").val());
+                $.ajax({
+                    url: "php/controler.php",
+                    dataType: 'text', // what to expect back from the PHP script
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    type: 'post',
+                    success: function (response) {
+                        $('#page-contents').html(response);
+                    },
+                    error: function (response) {
+                        $('#page-contents').html(response);
+                    }
+                });
+            }
+
+        }
+
+        function validateProfileUpdate() {
+            var allValid = true;
+            var message = '';
+            if ($('#filename').html() != '') {
+                if (document.getElementById('file').files[0].name.split('.')[document.getElementById('file').files[0].name.split('.').length - 1] != 'png') {
+                    allValid = false;
+                    message += 'Profile picture must be a png file.<br />';
+                }
+            }
+            if ($('#profilefirstname').val() == '') {
+                allValid = false;
+                setBad('profilefirstname');
+            }
+            else {
+                setGood('profilefirstname');
+            }
+            if ($('#profilelastname').val() == '') {
+                allValid = false;
+                setBad('profilelastname');
+            }
+            else {
+                setGood('profilelastname');
+            }
+            if ($('#profileemail').val() == '') {
+                allValid = false;
+                setBad('profileemail');
+            }
+            else {
+                setGood('profileemail');
+            }
+            if ($('#profilepassword').val() == '') {
+                allValid = false;
+                setBad('profilepassword');
+            }
+            else {
+                setGood('profilepassword');
+            }
+            if ($('#profilepassword2').val() == '') {
+                allValid = false;
+                setBad('profilepassword2');
+            }
+            else {
+                setGood('profilepassword2');
+            }
+            if ($('#profilepassword2').val() == $('#profilepassword').val() && $('#profilepassword').val() != '') {
+                setGood('profilepassword');
+                setGood('profilepassword2');
+            }
+            else {
+                allValid = false;
+                setBad('profilepassword');
+                setBad('profilepassword2');
+                message += 'Passwords must match<br />';
+            }
+            if ($('#profilephone').val() == '') {
+                allValid = false;
+                setBad('profilephone');
+            }
+            else {
+                setGood('profilephone');
+            }
+            if ($('#profileaddress').val() == '') {
+                allValid = false;
+                setBad('profileaddress');
+            }
+            else {
+                setGood('profileaddress');
+            }
+            if ($('#profilecity').val() == '') {
+                allValid = false;
+                setBad('profilecity');
+            }
+            else {
+                setGood('profilecity');
+            }
+            if ($('#profilezip').val() == '') {
+                allValid = false;
+                setBad('profilezip');
+            }
+            else {
+                setGood('profilezip');
+            }
+            if (!allValid) {
+                message += "Please fill in all required inputs";
+            }
+            $('#updateProfileMessage').html(message);
+            return allValid;
+        }
+
+        function validateSignup() {
+            var allValid = true;
+            var message = '';
+            if ($('#firstname').val() == '') {
+                allValid = false;
+                setBad('firstname');
+            }
+            else {
+                setGood('firstname');
+            }
+            if ($('#lastname').val() == '') {
+                allValid = false;
+                setBad('lastname');
+            }
+            else {
+                setGood('lastname');
+            }
+            if ($('#email').val() == '') {
+                allValid = false;
+                setBad('email');
+            }
+            else {
+                setGood('email');
+            }
+            if ($('#password').val() == '') {
+                allValid = false;
+                setBad('password');
+            }
+            else {
+                setGood('password');
+            }
+            if ($('#password2').val() == '') {
+                allValid = false;
+                setBad('password2');
+            }
+            else {
+                setGood('password2');
+            }
+            if ($('#password2').val() == $('#password').val() && $('#password').val() != '') {
+                setGood('password');
+                setGood('password2');
+            }
+            else {
+                allValid = false;
+                setBad('password');
+                setBad('password2');
+                message += 'Passwords must match<br />';
+            }
+            if ($('#phone').val() == '') {
+                allValid = false;
+                setBad('phone');
+            }
+            else {
+                setGood('phone');
+            }
+            if ($('#address').val() == '') {
+                allValid = false;
+                setBad('address');
+            }
+            else {
+                setGood('address');
+            }
+            if ($('#city').val() == '') {
+                allValid = false;
+                setBad('city');
+            }
+            else {
+                setGood('city');
+            }
+            if ($('#zip').val() == '') {
+                allValid = false;
+                setBad('zip');
+            }
+            else {
+                setGood('zip');
+            }
+            if (!allValid) {
+                message += "Please fill in all required inputs";
+            }
+            $('#signupMessage').html(message);
+            return allValid;
+        }
+
+        function setBad(id) {
+            $('#' + id).closest('span').show();
+            $('#' + id).closest('.form-control-feedback').addClass('has-error');
+            $('#' + id).closest('.form-control-feedback').removeClass('has-success');
+            $('#' + id).closest('.input-group').addClass('has-error');
+            $('#' + id).closest('.input-group').removeClass('has-success');
+        }
+
+        function setGood(id) {
+            $('#' + id).closest('.form-control-feedback').show();
+            $('#' + id).closest('.form-control-feedback').removeClass('has-error');
+            $('#' + id).closest('.form-control-feedback').addClass('has-success');
+            $('#' + id).closest('.input-group').removeClass('has-error');
+            $('#' + id).closest('.input-group').addClass('has-success');
+        }
+
+        function setNuetral(id) {
+            $('#' + id).closest('span').hide();
+            $('#' + id).closest('.form-control-feedback').removeClass('has-error');
+            $('#' + id).closest('.form-control-feedback').removeClass('has-success');
+            $('#' + id).closest('.input-group').removeClass('has-error');
+            $('#' + id).closest('.input-group').removeClass('has-success');
+        }
+    </script>
+    <style>
+        .input-group-addon {
+            text-align: left;
+            
+        }
+
+        .row {
+            padding-bottom: 5px!important;
+        }
+
+        #loading {
+            position: absolute;
+            left: calc(50% - 75px);
+            padding: 10px;
+            border: 1px solid black;
+            top: 250px;
+            background: white;
+            display:none;
+            z-index: 9000;
+        }
+    </style>
+</head>
+<body onload="loadBody()">
+    <script>
+        function loadBody() {
+            $('body').load('index.php');
+        }
+    </script>
+</body>
+</html>
