@@ -198,7 +198,7 @@
 					}
 					move_uploaded_file($_FILES['file']['tmp_name'],realpath(dirname(__FILE__) . '/..') . '/profilepic/' . $_SESSION['userID'] . '.png');
 					Database::prepare(
-                    "UPDATE tt_persions SET hasImage = ? WHERE id = ?",
+                    "UPDATE tt_persons SET hasImage = ? WHERE id = ?",
                     array(true,$_SESSION['userID'])
                 );
 				}
